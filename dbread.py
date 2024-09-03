@@ -12,6 +12,8 @@ load_dotenv(dotenv_path=env_path)
 
 api_key = os.getenv("OPENAI_API_KEY")
 
+print(os.getenv("DB_DATABASE"));
+
 def connect_and_read():
     connection = None  # Initialize connection before the try block
     try:
