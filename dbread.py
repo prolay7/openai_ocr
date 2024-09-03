@@ -20,14 +20,16 @@ print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
 print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
 print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
 print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
+print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
 
 def connect_and_read():
     connection = None  # Initialize connection before the try block
     try:
-        # Fetch APP_URL from environment variables
+        # Fetch APP_URL and FILE_DIRECTORY from environment variables
         app_url = os.getenv("APP_URL")
-        if not app_url:
-            print("Error: APP_URL is not set in the environment variables.")
+        file_directory = os.getenv("FILE_DIRECTORY")  # Directory where files are expected
+        if not app_url or not file_directory:
+            print("Error: APP_URL or FILE_DIRECTORY is not set in the environment variables.")
             return
 
         # Connect to the MySQL database
@@ -59,15 +61,21 @@ def connect_and_read():
             # Fetch all rows from the executed query
             rows = cursor.fetchall()
 
-            # Insert the fetched data into the ocr_logs table
+            # Insert the fetched data into the ocr_logs table if the file exists
             insert_query = """
             INSERT INTO ocr_logs (doc_id, user_id, file_path, file_type, status)
             VALUES (%s, %s, %s, %s, %s)
             """
             
             for row in rows:
-                cursor.execute(insert_query, (row[0], row[1], row[2], row[3], '0'))
-            
+                file_path = os.path.join(file_directory, row[2].replace(f'{app_url}/', ''))
+                
+                # Check if the file exists in the specified directory
+                if os.path.exists(file_path):
+                    cursor.execute(insert_query, (row[0], row[1], row[2], row[3], '0'))
+                else:
+                    print(f"File not found: {file_path}")
+
             # Commit the transaction
             connection.commit()
             print("Data inserted into ocr_logs table")
