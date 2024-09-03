@@ -1,5 +1,4 @@
 import os
-import easyocr
 from doctr.models import ocr_predictor
 from doctr.io import DocumentFile
 import pytesseract
