@@ -13,13 +13,14 @@ load_dotenv(dotenv_path=env_path)
 api_key = os.getenv("OPENAI_API_KEY")
 
 def connect_and_read():
+    connection = None  # Initialize connection before the try block
     try:
         # Connect to the MySQL database
         connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),      # e.g., 'localhost' or the server's IP
-            user=os.getenv("DB_USERNAME"),  # e.g., 'root'
-            password=os.getenv("DB_PASSWORD"),  # your MySQL password
-            database=os.getenv("DB_DATABASE")   # the database name
+            host=os.getenv("DB_HOST"),           # e.g., 'localhost' or the server's IP
+            user=os.getenv("DB_USERNAME"),       # e.g., 'root'
+            password=os.getenv("DB_PASSWORD"),   # your MySQL password
+            database=os.getenv("DB_DATABASE")    # the database name
         )
 
         if connection.is_connected():
@@ -29,7 +30,13 @@ def connect_and_read():
             cursor = connection.cursor()
 
             # Define the query to read data from the users table
-            query = "SELECT `users`.`id`,`avsdocs`.`doc_url`,`avsdocs`.`doc_file_type` FROM `avsdocs` LEFT JOIN `users` ON `users`.`id`=`avsdocs`.`user_id` WHERE `users`.`age_verified`<>'YES' ORDER BY `avsdocs`.`id` DESC"
+            query = """
+            SELECT `users`.`id`, `avsdocs`.`doc_url`, `avsdocs`.`doc_file_type`
+            FROM `avsdocs`
+            LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id`
+            WHERE `users`.`age_verified` <> 'YES'
+            ORDER BY `avsdocs`.`id` DESC
+            """
 
             # Execute the query
             cursor.execute(query)
@@ -46,7 +53,7 @@ def connect_and_read():
 
     finally:
         # Close the database connection
-        if connection.is_connected():
+        if connection and connection.is_connected():
             cursor.close()
             connection.close()
             print("Connection closed")
