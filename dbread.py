@@ -27,7 +27,7 @@ def connect_and_read():
     try:
         # Fetch APP_URL and FILE_DIRECTORY from environment variables
         app_url = os.getenv("APP_URL")
-        file_directory = os.getenv("FILE_DIRECTORY")  # Directory where files are expected
+        file_directory = Path(__file__).resolve().parent.parent/os.getenv("FILE_DIRECTORY")  # Directory where files are expected
         if not app_url or not file_directory:
             print("Error: APP_URL or FILE_DIRECTORY is not set in the environment variables.")
             return
