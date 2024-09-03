@@ -5,7 +5,7 @@ from mysql.connector import Error
 from pathlib import Path
 
 # Define the path to the .env file relative to the current file's location
-env_path = Path(__file__).resolve().parent/ '.env'
+env_path = Path(__file__).resolve().parent / '.env'
 print(f"Loading .env file from: {env_path}")
 
 # Load environment variables from the .env file
@@ -19,10 +19,17 @@ print(f"DB_HOST: {os.getenv('DB_HOST')}")
 print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
 print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
 print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
+print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
 
 def connect_and_read():
     connection = None  # Initialize connection before the try block
     try:
+        # Fetch APP_URL from environment variables
+        app_url = os.getenv("APP_URL")
+        if not app_url:
+            print("Error: APP_URL is not set in the environment variables.")
+            return
+
         # Connect to the MySQL database
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST"),           # e.g., 'localhost' or the server's IP
@@ -37,9 +44,9 @@ def connect_and_read():
             # Create a cursor object
             cursor = connection.cursor()
 
-            # Define the query to read data from the users table
-            query = """
-            SELECT `users`.`id`, CONCAT('https://yhsverification.rugby',`avsdocs`.`doc_url`) as doc_url, `avsdocs`.`doc_file_type`
+            # Define the query to read data from the users table, replacing the hardcoded URL with the dynamic app_url
+            query = f"""
+            SELECT `users`.`id`, CONCAT('{app_url}', `avsdocs`.`doc_url`) as doc_url, `avsdocs`.`doc_file_type`
             FROM `avsdocs`
             LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id`
             WHERE `users`.`age_verified` <> 'YES'
