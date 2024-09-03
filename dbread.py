@@ -27,11 +27,19 @@ def connect_and_read():
     try:
         # Fetch APP_URL and FILE_DIRECTORY from environment variables
         app_url = os.getenv("APP_URL")
-        file_directory = Path(__file__).resolve().parent.parent/os.getenv("FILE_DIRECTORY")  # Directory where files are expected
-        if not app_url or not file_directory:
-            print("Error: APP_URL or FILE_DIRECTORY is not set in the environment variables.")
+        file_directory = os.getenv("FILE_DIRECTORY")  # Directory where files are expected
+        
+        # Check if the environment variables are loaded correctly
+        if not app_url:
+            print("Error: APP_URL is not set in the environment variables.")
             return
-
+        if not file_directory:
+            print("Error: FILE_DIRECTORY is not set in the environment variables.")
+            return
+        
+        # Convert file_directory to a Path object
+        file_directory = Path(file_directory)
+        
         # Connect to the MySQL database
         connection = mysql.connector.connect(
             host=os.getenv("DB_HOST"),           # e.g., 'localhost' or the server's IP
@@ -68,10 +76,10 @@ def connect_and_read():
             """
             
             for row in rows:
-                file_path = os.path.join(file_directory, row[2].replace(f'{app_url}/', ''))
+                file_path = file_directory / row[2].replace(f'{app_url}/', '')
                 
                 # Check if the file exists in the specified directory
-                if os.path.exists(file_path):
+                if file_path.exists():
                     cursor.execute(insert_query, (row[0], row[1], row[2], row[3], '0'))
                 else:
                     print(f"File not found: {file_path}")
