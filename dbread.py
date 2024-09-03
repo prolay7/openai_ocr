@@ -37,8 +37,14 @@ def connect_and_read():
             print("Error: FILE_DIRECTORY is not set in the environment variables.")
             return
         
-        # Convert file_directory to a Path object
-        file_directory = Path(file_directory)
+        # Convert file_directory to a Path object starting from /var/www/html
+        base_directory = Path('/var/www/html')  # Base directory on your server
+        file_directory = base_directory / file_directory  # Correctly resolve the full path
+        
+        # Check if file_directory exists
+        if not file_directory.exists():
+            print(f"Error: The specified file directory does not exist: {file_directory}")
+            return
         
         # Connect to the MySQL database
         connection = mysql.connector.connect(
@@ -76,7 +82,8 @@ def connect_and_read():
             """
             
             for row in rows:
-                file_path = file_directory / row[2].replace(f'{app_url}/', '')
+                # Construct the file path relative to the base directory
+                file_path = file_directory / Path(row[2].replace(f'{app_url}/', ''))
                 
                 # Check if the file exists in the specified directory
                 if file_path.exists():
