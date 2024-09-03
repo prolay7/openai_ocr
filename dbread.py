@@ -44,9 +44,9 @@ def connect_and_read():
             # Create a cursor object
             cursor = connection.cursor()
 
-            # Define the query to read data from the users table, replacing the hardcoded URL with the dynamic app_url
+            # Define the query to read data from the avsdocs and users tables
             query = f"""
-            SELECT `users`.`id`, CONCAT('{app_url}', `avsdocs`.`doc_url`) as doc_url, `avsdocs`.`doc_file_type`
+            SELECT `avsdocs`.`id`, `users`.`id` AS user_id, CONCAT('{app_url}', `avsdocs`.`doc_url`) AS doc_url, `avsdocs`.`doc_file_type`
             FROM `avsdocs`
             LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id`
             WHERE `users`.`age_verified` <> 'YES'
@@ -59,9 +59,18 @@ def connect_and_read():
             # Fetch all rows from the executed query
             rows = cursor.fetchall()
 
-            # Display the results
+            # Insert the fetched data into the ocr_logs table
+            insert_query = """
+            INSERT INTO ocr_logs (doc_id, user_id, file_path, file_type)
+            VALUES (%s, %s, %s, %s)
+            """
+            
             for row in rows:
-                print(row)
+                cursor.execute(insert_query, (row[0], row[1], row[2], row[3]))
+            
+            # Commit the transaction
+            connection.commit()
+            print("Data inserted into ocr_logs table")
 
     except Error as e:
         print(f"Error: {e}")
