@@ -6,13 +6,19 @@ from pathlib import Path
 
 # Define the path to the .env file relative to the current file's location
 env_path = Path(__file__).resolve().parent.parent / '.env'
+print(f"Loading .env file from: {env_path}")
 
 # Load environment variables from the .env file
-load_dotenv(dotenv_path=env_path)
+if load_dotenv(dotenv_path=env_path):
+    print("Environment variables loaded successfully.")
+else:
+    print("Failed to load environment variables.")
 
-api_key = os.getenv("OPENAI_API_KEY")
-
-print(os.getenv("DB_DATABASE"));
+# Print environment variables for debugging
+print(f"DB_HOST: {os.getenv('DB_HOST')}")
+print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
+print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
+print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
 
 def connect_and_read():
     connection = None  # Initialize connection before the try block
