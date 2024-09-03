@@ -39,7 +39,7 @@ def connect_and_read():
 
             # Define the query to read data from the users table
             query = """
-            SELECT `users`.`id`, `avsdocs`.`doc_url`, `avsdocs`.`doc_file_type`
+            SELECT `users`.`id`, CONCAT('https://yhsverification.rugby',`avsdocs`.`doc_url`) as doc_url, `avsdocs`.`doc_file_type`
             FROM `avsdocs`
             LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id`
             WHERE `users`.`age_verified` <> 'YES'
