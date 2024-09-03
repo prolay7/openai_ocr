@@ -5,7 +5,7 @@ from mysql.connector import Error
 from pathlib import Path
 
 # Define the path to the .env file relative to the current file's location
-env_path = Path(__file__).resolve() / '.env'
+env_path = Path(__file__).resolve().parent/ '.env'
 print(f"Loading .env file from: {env_path}")
 
 # Load environment variables from the .env file
