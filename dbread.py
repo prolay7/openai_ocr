@@ -61,12 +61,12 @@ def connect_and_read():
 
             # Insert the fetched data into the ocr_logs table
             insert_query = """
-            INSERT INTO ocr_logs (doc_id, user_id, file_path, file_type,status)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO ocr_logs (doc_id, user_id, file_path, file_type, status)
+            VALUES (%s, %s, %s, %s, %s)
             """
             
             for row in rows:
-                cursor.execute(insert_query, (row[0], row[1], row[2], row[3],'0'))
+                cursor.execute(insert_query, (row[0], row[1], row[2], row[3], '0'))
             
             # Commit the transaction
             connection.commit()
