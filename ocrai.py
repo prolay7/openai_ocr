@@ -25,7 +25,7 @@ print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
 print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
 
 # Set OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Make sure your .env file has this key set
+api_key = os.getenv("OPENAI_API_KEY")  # Make sure your .env file has this key set
 
 
 def extract_date_of_birth(extracted_text):
