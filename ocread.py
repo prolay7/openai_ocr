@@ -132,7 +132,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
                 select_query = """
                 SELECT * FROM `ocr_logs` WHERE doc_id = %s
                 """
-                cursor.execute(select_query, (doc_id,))
+                cursor.execute(select_query, (doc_id))
 
                 # Fetch the row matching the doc_id
                 row = cursor.fetchone()
@@ -209,6 +209,8 @@ def connect_and_read():
 
             # Commit the transaction if necessary (typically for updates, not for selects)
             connection.commit()
+
+            extract_text_from_image(corrected_image, file_path, row[0])
     
     except Error as e:
         print(f"Error: {e}")
