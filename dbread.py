@@ -38,7 +38,7 @@ def connect_and_read():
             return
         
         # Convert file_directory to a Path object starting from /var/www/html
-        base_directory = Path('/var/www/html')  # Base directory on your server
+        base_directory = Path(__file__).resolve().parent.parent  # Base directory on your server
         file_directory = base_directory / file_directory  # Correctly resolve the full path
         
         # Check if file_directory exists
