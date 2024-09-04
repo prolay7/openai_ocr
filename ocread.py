@@ -105,7 +105,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
 
                 # Define the query to read data from the ocr_logs table using the given doc_id
                 select_query = """
-                SELECT * FROM `ocr_logs` WHERE doc_id = %s
+                SELECT * FROM `ocr_logs` WHERE id = %s
                 """
                 cursor.execute(select_query, (doc_id,))
 
@@ -117,7 +117,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
                     update_query = """
                     UPDATE `ocr_logs` 
                     SET `response_data` = %s 
-                    WHERE `doc_id` = %s
+                    WHERE `id` = %s
                     """
                     cursor.execute(update_query, (extracted_text, doc_id))
                     connection.commit()
