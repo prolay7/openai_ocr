@@ -46,6 +46,22 @@ def connect_and_read():
 
             # Create a cursor object
             cursor = connection.cursor()
+
+            # Define the query to read data from the avsdocs and users tables
+            query = f"""
+            SELECT * FROM `ocr_logs` WHERE `read_status`='pending' ORDER BY `doc_id` ASC
+            """
+
+            # Execute the query
+            cursor.execute(query)
+
+            # Fetch all rows from the executed query
+            rows = cursor.fetchall()
+
+            for row in rows:
+                print("File path:{row[6]}")
+                 # Commit the transaction
+                connection.commit()
     
     except Error as e:
         print(f"Error: {e}")
