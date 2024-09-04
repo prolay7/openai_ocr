@@ -4,7 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 from pathlib import Path
 import requests
-import openai  # Ensure you have the openai package installed
+from openai import OpenAI  # Ensure you have the openai package installed
 
 # Define the path to the .env file relative to the current file's location
 env_path = Path(__file__).resolve().parent / '.env'
@@ -24,8 +24,10 @@ print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
 print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
 print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
 
-# Set OpenAI API key
-api_key = os.getenv("OPENAI_API_KEY")  # Make sure your .env file has this key set
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
 
 
 def extract_date_of_birth(extracted_text):
@@ -74,7 +76,7 @@ def extract_dob_from_text(text):
     Sends extracted text to GPT-4 to identify the DOB.
     """
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
@@ -89,7 +91,7 @@ def extract_dob_from_text(text):
         )
         
         # Extract DOB from the response
-        dob = response.choices[0].message['content'].strip()
+        dob = response.choices[0]..message.content.strip()
         print(f"Extracted DOB: {dob}")
         return dob
 
