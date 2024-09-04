@@ -68,6 +68,36 @@ def extract_date_of_birth(extracted_text):
         print(f"Error extracting date of birth: {e}")
         return None
 
+
+def extract_dob_from_text(text):
+    """
+    Sends extracted text to GPT-4 to identify the DOB.
+    """
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that extracts dates of birth from the provided text.",
+                },
+                {
+                    "role": "user",
+                    "content": f"Extract the date of birth from the following text:\n\n{text}",
+                },
+            ],
+        )
+        
+        # Extract DOB from the response
+        dob = response.choices[0].message['content'].strip()
+        print(f"Extracted DOB: {dob}")
+        return dob
+
+    except Exception as e:
+        print(f"Error with OpenAI API: {e}")
+        return None
+
+
 def connect_and_read():
     connection = None  # Initialize connection before the try block
     cursor = None      # Initialize cursor to ensure it's defined if used in finally block
@@ -102,7 +132,7 @@ def connect_and_read():
 
                 extracted_text=row[3]
 
-                dob=extract_date_of_birth(extracted_text);
+                dob=extract_dob_from_text(extracted_text);
             
 
                 # If the data is found, update the response_data with the extracted text
