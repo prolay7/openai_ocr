@@ -91,7 +91,7 @@ def extract_dob_from_text(text):
         )
         
         # Extract DOB from the response
-        dob = response.choices[0]..message.content.strip()
+        dob = response.choices[0].message.content.strip()
         print(f"Extracted DOB: {dob}")
         return dob
 
