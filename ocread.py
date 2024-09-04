@@ -4,33 +4,11 @@ import mysql.connector
 from mysql.connector import Error
 from doctr.models import ocr_predictor
 from doctr.io import DocumentFile
-import pytesseract
 from pathlib import Path
 from PIL import Image, ExifTags
-import requests
 
-# Define the path to the .env file relative to the current file's location
-env_path = Path(__file__).resolve().parent / '.env'
-print(f"Loading .env file from: {env_path}")
-
-# Load environment variables from the .env file
-if load_dotenv(dotenv_path=env_path):
-    print("Environment variables loaded successfully.")
-else:
-    print("Failed to load environment variables.")
-
-api_key = os.getenv("OPENAI_API_KEY")
-
-# Print environment variables for debugging
-print(f"DB_HOST: {os.getenv('DB_HOST')}")
-print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
-print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
-print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
-print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
-print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
-
-# Initialize an empty list to store all the extracted text
-all_text = []
+# Load environment variables from .env file
+load_dotenv()
 
 # Function to correct image orientation using Pillow
 def correct_image_orientation(image_path):
@@ -56,21 +34,13 @@ def correct_image_orientation(image_path):
     except Exception as e:
         print(f"Error correcting image orientation: {e}")
         return None
-    
 
-import os
-from dotenv import load_dotenv
-import mysql.connector
-from mysql.connector import Error
-from doctr.models import ocr_predictor
-from doctr.io import DocumentFile
-from pathlib import Path
-
-# Load environment variables from .env file
-load_dotenv()
 
 def extract_text_from_image(corrected_image, file_path, doc_id):
     if corrected_image:
+        # Ensure file_path is a Path object
+        file_path = Path(file_path)
+
         # Save the corrected image to a temporary file
         temp_file_path = file_path.with_name("corrected_" + file_path.name)
         corrected_image.save(temp_file_path)
@@ -110,6 +80,11 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
         # Optionally, remove the temporary file after processing
         os.remove(temp_file_path)
 
+        # Check if extracted_text is not empty before proceeding
+        if not extracted_text.strip():
+            print("Extracted text is empty. Skipping database operation.")
+            return  # Exit the function if no text was extracted
+
         connection = None  # Initialize connection before the try block
         cursor = None      # Initialize cursor to ensure it's defined if used in finally block
 
@@ -132,7 +107,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
                 select_query = """
                 SELECT * FROM `ocr_logs` WHERE doc_id = %s
                 """
-                cursor.execute(select_query, (doc_id))
+                cursor.execute(select_query, (doc_id,))
 
                 # Fetch the row matching the doc_id
                 row = cursor.fetchone()
@@ -164,7 +139,6 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
 
     else:
         print("Error: Could not correct the image orientation.")
-
 
 
 def connect_and_read():
@@ -199,7 +173,7 @@ def connect_and_read():
             # Iterate through the fetched rows
             for row in rows:
                 # Use proper string formatting to print the file path
-                print(f"File path: {row[6]}")
+               # print(f"File path: {row[6]}")
 
                 # Image URL to be downloaded and processed
                 file_path = row[7]
@@ -207,11 +181,9 @@ def connect_and_read():
                 # Correct the image orientation
                 corrected_image = correct_image_orientation(file_path)
 
-            # Commit the transaction if necessary (typically for updates, not for selects)
-            connection.commit()
+                # Extract text from the image
+                extract_text_from_image(corrected_image, file_path, row[0])  # Pass the correct doc_id from row
 
-            extract_text_from_image(corrected_image, file_path, 2)
-    
     except Error as e:
         print(f"Error: {e}")
 
