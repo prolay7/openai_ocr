@@ -77,7 +77,7 @@ def connect_and_read():
 
             # Insert the fetched data into the ocr_logs table if the file exists
             insert_query = """
-            INSERT INTO ocr_logs (doc_id, user_id, file_path, file_type, status)
+            INSERT INTO ocr_logs (doc_id, user_id, file_path, file_disk_path, file_type, status)
             VALUES (%s, %s, %s, %s, %s)
             """
             
@@ -87,7 +87,7 @@ def connect_and_read():
                 
                 # Check if the file exists in the specified directory
                 if file_path.exists():
-                    cursor.execute(insert_query, (row[0], row[1], row[2], row[3], '0'))
+                    cursor.execute(insert_query, (row[0], row[1], row[2],file_path, row[3], '0'))
                 else:
                     print(f"File not found: {file_path}")
 
