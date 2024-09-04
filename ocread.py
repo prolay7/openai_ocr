@@ -14,6 +14,8 @@ if load_dotenv(dotenv_path=env_path):
 else:
     print("Failed to load environment variables.")
 
+api_key = os.getenv("OPENAI_API_KEY")
+
 # Print environment variables for debugging
 print(f"DB_HOST: {os.getenv('DB_HOST')}")
 print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
@@ -55,6 +57,9 @@ def connect_and_read():
             for row in rows:
                 # Use proper string formatting to print the file path
                 print(f"File path: {row[6]}")
+
+                # Image URL to be downloaded and processed
+                image_url = row[6]
 
             # Commit the transaction if necessary (typically for updates, not for selects)
             connection.commit()

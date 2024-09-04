@@ -24,6 +24,7 @@ print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY 
 
 def connect_and_read():
     connection = None  # Initialize connection before the try block
+    cursor = None      # Initialize cursor to ensure it's defined if used in finally block
     try:
         # Fetch APP_URL and FILE_DIRECTORY from environment variables
         app_url = os.getenv("APP_URL")
@@ -78,16 +79,17 @@ def connect_and_read():
             # Insert the fetched data into the ocr_logs table if the file exists
             insert_query = """
             INSERT INTO ocr_logs (doc_id, user_id, file_path, file_disk_path, file_type, status)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """
             
             for row in rows:
                 # Construct the file path relative to the base directory
-                file_path = file_directory / Path(row[2].replace(f'{app_url}/', ''))
+                relative_path = row[2].replace(f'{app_url}/', '')  # Adjusted replacement pattern
+                file_path = file_directory / Path(relative_path)  # Correctly resolve the file path
                 
                 # Check if the file exists in the specified directory
                 if file_path.exists():
-                    cursor.execute(insert_query, (row[0], row[1], row[2],{file_path}, row[3], '0'))
+                    cursor.execute(insert_query, (row[0], row[1], row[2], str(file_path), row[3], '0'))
                 else:
                     print(f"File not found: {file_path}")
 
@@ -99,9 +101,11 @@ def connect_and_read():
         print(f"Error: {e}")
 
     finally:
+        # Close the cursor if it exists
+        if cursor:
+            cursor.close()
         # Close the database connection
         if connection and connection.is_connected():
-            cursor.close()
             connection.close()
             print("Connection closed")
 
