@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
 from pathlib import Path
+import requests
 import openai  # Ensure you have the openai package installed
 
 # Define the path to the .env file relative to the current file's location
@@ -33,16 +34,31 @@ def extract_date_of_birth(extracted_text):
     The date of birth will be formatted as yyyy-mm-dd.
     """
     try:
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
         # Call the GPT-4 API to extract the date of birth
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
+        
+
+        payload = {
+            "model": "gpt-4o",
+            "messages": [
                 {
                     "role": "user",
-                    "content": f"Extract the date of birth or DOB or Date of birth from the following text in yyyy-mm-dd format:\n\n{extracted_text}"
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"Extract only Date of Birth from the following text:\n\n{extracted_text}. do not give any extra detail just reply date in given format  yyyy-mm-dd  you need to give response in this format only do not add any other details or any other thing."
+                        }
+                    ]
                 }
             ]
-        )
+        }
+    
+    
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
         # Extract the response text
         extracted_dob = response['choices'][0]['message']['content'].strip()
         print(f"Extracted Date of Birth: {extracted_dob}")
