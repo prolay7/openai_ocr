@@ -68,6 +68,9 @@ def connect_and_read():
         if connection.is_connected():
             print("Connected to the database")
 
+            # Create a cursor object
+            cursor = connection.cursor()
+
             # Define the query to read data from the avsdocs and users tables
             query = f"""
             SELECT * FROM `ocr_logs` WHERE `read_status`='completed' ORDER BY `doc_id` ASC
