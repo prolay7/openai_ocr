@@ -87,7 +87,7 @@ def connect_and_read():
                 
                 # Check if the file exists in the specified directory
                 if file_path.exists():
-                    cursor.execute(insert_query, (row[0], row[1], row[2],file_path, row[3], '0'))
+                    cursor.execute(insert_query, (row[0], row[1], row[2],{file_path}, row[3], '0'))
                 else:
                     print(f"File not found: {file_path}")
 
