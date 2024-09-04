@@ -116,7 +116,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
                 if row:
                     update_query = """
                     UPDATE `ocr_logs` 
-                    SET `response_data` = %s 
+                    SET `response_data` = %s ,`read_status`='completed'
                     WHERE `id` = %s
                     """
                     cursor.execute(update_query, (extracted_text, doc_id))
