@@ -187,7 +187,7 @@ def connect_and_read():
 
             # Define the query to read data from the ocr_logs table
             query = """
-            SELECT * FROM `ocr_logs` WHERE `read_status`='pending' ORDER BY `doc_id` ASC
+            SELECT * FROM `ocr_logs` WHERE `file_type`!='application/pdf' AND `read_status`='pending' ORDER BY `doc_id` ASC
             """
 
             # Execute the query
@@ -210,7 +210,7 @@ def connect_and_read():
             # Commit the transaction if necessary (typically for updates, not for selects)
             connection.commit()
 
-            extract_text_from_image(corrected_image, file_path, row[0])
+            extract_text_from_image(corrected_image, file_path, 2)
     
     except Error as e:
         print(f"Error: {e}")
