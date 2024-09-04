@@ -110,3 +110,6 @@ def connect_and_read():
         if connection and connection.is_connected():
             connection.close()
             print("Connection closed")
+
+
+connect_and_read()
