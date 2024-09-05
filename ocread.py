@@ -8,8 +8,16 @@ import PyPDF2
 from pathlib import Path
 from PIL import Image, ExifTags
 
+# Define the path to the .env file relative to the current file's location
+env_path = Path(__file__).resolve().parent / '.env'
+print(f"Loading .env file from: {env_path}")
+
 # Load environment variables from .env file
-load_dotenv()
+# Load environment variables from the .env file
+if load_dotenv(dotenv_path=env_path):
+    print("Environment variables loaded successfully.")
+else:
+    print("Failed to load environment variables.")
 
 # Function to correct image orientation using Pillow
 def correct_image_orientation(image_path):
@@ -106,7 +114,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
 
                 # Define the query to read data from the ocr_logs table using the given doc_id
                 select_query = """
-                SELECT * FROM `ocr_logs` WHERE id = %s
+                SELECT * FROM `ocr_logs` WHERE `id` = %s ORDER BY `id` ASC
                 """
                 cursor.execute(select_query, (doc_id,))
 
@@ -118,7 +126,7 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
                     update_query = """
                     UPDATE `ocr_logs` 
                     SET `response_data` = %s ,`read_status`='completed'
-                    WHERE `id` = %s
+                    WHERE `id` = %s ORDER BY `id` ASC
                     """
                     cursor.execute(update_query, (extracted_text, doc_id))
                     connection.commit()
@@ -184,7 +192,7 @@ def extract_text_from_pdf(pdf_file,doc_id):
 
                         # Define the query to read data from the ocr_logs table using the given doc_id
                         select_query = """
-                        SELECT * FROM `ocr_logs` WHERE id = %s
+                        SELECT * FROM `ocr_logs` WHERE `id` = %s ORDER BY `id` ASC
                         """
                         cursor.execute(select_query, (doc_id,))
 
@@ -196,7 +204,7 @@ def extract_text_from_pdf(pdf_file,doc_id):
                             update_query = """
                             UPDATE `ocr_logs` 
                             SET `response_data` = %s ,`read_status`='completed'
-                            WHERE `id` = %s
+                            WHERE `id` = %s ORDER BY `id` ASC
                             """
                             cursor.execute(update_query, (extracted_text, doc_id))
                             connection.commit()

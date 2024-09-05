@@ -35,7 +35,7 @@ def extract_dob_from_text(text):
                 },
                 {
                     "role": "user",
-                    "content": f"Extract the date of birth or DOB or Date of birth from the following text:\n\n{text} in yyyy-mm-dd format only and do not send any other data alongwith the DOB.",
+                    "content": f"Extract the date of birth or DOB or Date of birth or Dale de naissance Fechi de oicimiento from the following text:\n\n{text} in yyyy-mm-dd format only and do not send any other data alongwith the DOB.",
                 },
             ],
         )
