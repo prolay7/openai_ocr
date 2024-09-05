@@ -91,7 +91,7 @@ def extract_date_of_birth(extracted_text):
         return None
 
 
-def connect_and_read():
+def connect_and_read_ocai():
     connection = None  # Initialize connection before the try block
     cursor = None      # Initialize cursor to ensure it's defined if used in finally block
 
@@ -154,4 +154,4 @@ def connect_and_read():
             print("Connection closed")
 
 
-connect_and_read()
+#connect_and_read_ocai()

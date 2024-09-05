@@ -221,7 +221,7 @@ def extract_text_from_pdf(pdf_file,doc_id):
         return None
 
 
-def connect_and_read():
+def connect_and_read_oc():
     connection = None  # Initialize connection before the try block
     cursor = None      # Initialize cursor to ensure it's defined if used in finally block
     try:
@@ -281,4 +281,4 @@ def connect_and_read():
             print("Connection closed")
 
 # Run the function
-connect_and_read()
+#connect_and_read_oc()

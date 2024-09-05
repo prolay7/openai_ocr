@@ -15,12 +15,12 @@ else:
     print("Failed to load environment variables.")
 
 # Print environment variables for debugging
-print(f"DB_HOST: {os.getenv('DB_HOST')}")
-print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
-print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
-print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
-print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
-print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
+#print(f"DB_HOST: {os.getenv('DB_HOST')}")
+#print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
+#print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
+#print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
+#print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
+#print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
 
 def connect_and_read():
     connection = None  # Initialize connection before the try block
@@ -110,4 +110,4 @@ def connect_and_read():
             print("Connection closed")
 
 # Run the function
-connect_and_read()
+#connect_and_read()
