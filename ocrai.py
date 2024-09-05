@@ -118,3 +118,7 @@ def connect_and_read_ocai():
         if connection and connection.is_connected():
             connection.close()
             print("Connection closed")
+
+print("Starting connect_and_read_ocai...")
+connect_and_read_ocai()
+print("connect_and_read_ocai completed.")

@@ -281,4 +281,6 @@ def connect_and_read_oc():
             print("Connection closed")
 
 # Run the function
-#connect_and_read_oc()
+print("Starting connect_and_read_oc...")
+connect_and_read_oc()
+print("connect_and_read_oc completed.")

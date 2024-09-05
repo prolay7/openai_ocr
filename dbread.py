@@ -108,3 +108,6 @@ def connect_and_read():
             connection.close()
             print("Connection closed")
 
+print("Starting connect_and_read...")
+connect_and_read()
+print("connect_and_read completed.")
