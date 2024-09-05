@@ -5,6 +5,7 @@ from dbread import connect_and_read
 from ocread import connect_and_read_oc
 from ocrai import connect_and_read_ocai
 
+
  # Call the first function and wait for it to complete
 print("Starting connect_and_read...")
 connect_and_read()
