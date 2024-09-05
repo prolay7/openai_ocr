@@ -11,9 +11,9 @@ connect_and_read()
 print("connect_and_read completed.")
 
 # Call the second function and wait for it to complete
-# print("Starting connect_and_read_oc...")
-# connect_and_read_oc()
-# print("connect_and_read_oc completed.")
+print("Starting connect_and_read_oc...")
+connect_and_read_oc()
+print("connect_and_read_oc completed.")
 
 # Call the third function and wait for it to complete
 # print("Starting connect_and_read_ocai...")
