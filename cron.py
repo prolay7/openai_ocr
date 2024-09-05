@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Import the function from module1
 from dbread import connect_and_read
 #from ocread import connect_and_read_oc
