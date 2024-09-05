@@ -17,6 +17,6 @@ connect_and_read_oc()
 print("connect_and_read_oc completed.")
 
 # Call the third function and wait for it to complete
-# print("Starting connect_and_read_ocai...")
-# connect_and_read_ocai()
-# print("connect_and_read_ocai completed.")
+print("Starting connect_and_read_ocai...")
+connect_and_read_ocai()
+print("connect_and_read_ocai completed.")
