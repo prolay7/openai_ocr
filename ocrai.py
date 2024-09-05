@@ -16,18 +16,38 @@ if load_dotenv(dotenv_path=env_path):
 else:
     print("Failed to load environment variables.")
 
-# Print environment variables for debugging
-print(f"DB_HOST: {os.getenv('DB_HOST')}")
-print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
-print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
-print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
-print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
-print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
-
 client = OpenAI(
     # This is the default and can be omitted
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
+
+def extract_dob_from_text(text):
+    """
+    Sends extracted text to GPT-4 to identify the DOB.
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that extracts dates of birth from the provided text.",
+                },
+                {
+                    "role": "user",
+                    "content": f"Extract the date of birth or DOB or Date of birth from the following text:\n\n{text} in yyyy-mm-dd format only and do not send any other data alongwith the DOB.",
+                },
+            ],
+        )
+        
+        # Extract DOB from the response
+        dob = response.choices[0].message.content.strip()
+        print(f"Extracted DOB: {dob}")
+        return dob
+
+    except Exception as e:
+        print(f"Error with OpenAI API: {e}")
+        return None
 
 
 def extract_date_of_birth(extracted_text):
@@ -68,35 +88,6 @@ def extract_date_of_birth(extracted_text):
 
     except Exception as e:
         print(f"Error extracting date of birth: {e}")
-        return None
-
-
-def extract_dob_from_text(text):
-    """
-    Sends extracted text to GPT-4 to identify the DOB.
-    """
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant that extracts dates of birth from the provided text.",
-                },
-                {
-                    "role": "user",
-                    "content": f"Extract the date of birth from the following text:\n\n{text}",
-                },
-            ],
-        )
-        
-        # Extract DOB from the response
-        dob = response.choices[0].message.content.strip()
-        print(f"Extracted DOB: {dob}")
-        return dob
-
-    except Exception as e:
-        print(f"Error with OpenAI API: {e}")
         return None
 
 
