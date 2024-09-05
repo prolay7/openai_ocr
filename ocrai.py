@@ -42,52 +42,16 @@ def extract_dob_from_text(text):
         
         # Extract DOB from the response
         dob = response.choices[0].message.content.strip()
-        print(f"Extracted DOB: {dob}")
-        return dob
+        # Check if the extracted DOB matches the YYYY-MM-DD format
+        if dob and len(dob) == 10 and dob[4] == '-' and dob[7] == '-':
+            print(f"Extracted DOB: {dob}")
+            return dob
+
+        print("Error: DOB extraction failed or format is incorrect.")
+        return None
 
     except Exception as e:
         print(f"Error with OpenAI API: {e}")
-        return None
-
-
-def extract_date_of_birth(extracted_text):
-    """
-    Extracts the date of birth from the extracted text using the GPT-4 API.
-    The date of birth will be formatted as yyyy-mm-dd.
-    """
-    try:
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        }
-        # Call the GPT-4 API to extract the date of birth
-        
-
-        payload = {
-            "model": "gpt-4o",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": f"Extract only Date of Birth from the following text:\n\n{extracted_text}. do not give any extra detail just reply date in given format  yyyy-mm-dd  you need to give response in this format only do not add any other details or any other thing."
-                        }
-                    ]
-                }
-            ]
-        }
-    
-    
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-        # Extract the response text
-        extracted_dob = response['choices'][0]['message']['content'].strip()
-        print(f"Extracted Date of Birth: {extracted_dob}")
-        return extracted_dob
-
-    except Exception as e:
-        print(f"Error extracting date of birth: {e}")
         return None
 
 
@@ -125,17 +89,23 @@ def connect_and_read_ocai():
 
                 extracted_text=row[3]
 
-                dob=extract_dob_from_text(extracted_text);
-            
+                dob=extract_dob_from_text(extracted_text);  
 
+                # Determine the appropriate status based on the result of DOB extraction
+                if dob:
+                    status = 'dob extracted'
+                else:
+                    status = f"Error: {dob}"  # If dob is None, it will contain the error message
+          
                 # If the data is found, update the response_data with the extracted text
                 if row:
+                     # Update the record in the ocr_logs table
                     update_query = """
                     UPDATE `ocr_logs` 
-                    SET `dob` = %s ,`read_status`='completed'
+                    SET `dob` = %s, `status` = %s
                     WHERE `id` = %s
                     """
-                    cursor.execute(update_query, (dob,row[0]))
+                    cursor.execute(update_query, (dob if dob else '', status, row[0]))
                     connection.commit()
                     print(f"Updated response_data for doc_id {row[0]}.")
                 else:
@@ -152,6 +122,3 @@ def connect_and_read_ocai():
         if connection and connection.is_connected():
             connection.close()
             print("Connection closed")
-
-
-#connect_and_read_ocai()
