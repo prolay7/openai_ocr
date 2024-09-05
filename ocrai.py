@@ -119,6 +119,6 @@ def connect_and_read_ocai():
             connection.close()
             print("Connection closed")
 
-print("Starting connect_and_read_ocai...")
-connect_and_read_ocai()
-print("connect_and_read_ocai completed.")
+# print("Starting connect_and_read_ocai...")
+# connect_and_read_ocai()
+# print("connect_and_read_ocai completed.")
