@@ -229,7 +229,7 @@ def extract_text_from_pdf_v1(pdf_file,doc_id):
         print(f"Error reading PDF file: {e}")
         return None
 
-def extract_text_from_pdf(pdf_file):
+def extract_text_from_pdf(pdf_file,doc_id):
     try:
         # Open the PDF file using pdfplumber
         with pdfplumber.open(pdf_file) as pdf:
@@ -266,7 +266,7 @@ def extract_text_from_pdf(pdf_file):
                     select_query = """
                     SELECT * FROM `ocr_logs` WHERE `id` = %s ORDER BY `id` ASC
                     """
-                    cursor.execute(select_query, (doc_id,))
+                    cursor.execute(select_query, (doc_id))
 
                     # Fetch the row matching the doc_id
                     row = cursor.fetchone()
