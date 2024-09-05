@@ -14,14 +14,6 @@ if load_dotenv(dotenv_path=env_path):
 else:
     print("Failed to load environment variables.")
 
-# Print environment variables for debugging
-#print(f"DB_HOST: {os.getenv('DB_HOST')}")
-#print(f"DB_USERNAME: {os.getenv('DB_USERNAME')}")
-#print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
-#print(f"DB_DATABASE: {os.getenv('DB_DATABASE')}")
-#print(f"APP_URL: {os.getenv('APP_URL')}")  # Print APP_URL to ensure it's loaded
-#print(f"FILE_DIRECTORY: {os.getenv('FILE_DIRECTORY')}")  # Print FILE_DIRECTORY to ensure it's loaded
-
 def connect_and_read():
     connection = None  # Initialize connection before the try block
     cursor = None      # Initialize cursor to ensure it's defined if used in finally block
@@ -76,12 +68,16 @@ def connect_and_read():
             # Fetch all rows from the executed query
             rows = cursor.fetchall()
 
-            # Insert the fetched data into the ocr_logs table if the file exists
+            # Insert the fetched data into the ocr_logs table if the file exists and the record does not already exist
             insert_query = """
             INSERT INTO ocr_logs (doc_id, user_id, file_path, file_disk_path, file_type, status)
             VALUES (%s, %s, %s, %s, %s, %s)
             """
             
+            check_query = """
+            SELECT COUNT(*) FROM ocr_logs WHERE doc_id = %s AND user_id = %s
+            """
+
             for row in rows:
                 # Construct the file path relative to the base directory
                 relative_path = row[2].replace(f'{app_url}/', '')  # Adjusted replacement pattern
@@ -89,7 +85,14 @@ def connect_and_read():
                 
                 # Check if the file exists in the specified directory
                 if file_path.exists():
-                    cursor.execute(insert_query, (row[0], row[1], row[2], str(file_path), row[3], '0'))
+                    # Check if the record already exists in ocr_logs
+                    cursor.execute(check_query, (row[0], row[1]))
+                    record_exists = cursor.fetchone()[0] > 0
+                    
+                    if not record_exists:
+                        cursor.execute(insert_query, (row[0], row[1], row[2], str(file_path), row[3], '0'))
+                    else:
+                        print(f"Record already exists for doc_id: {row[0]}, user_id: {row[1]}")
                 else:
                     print(f"File not found: {file_path}")
 
@@ -109,5 +112,3 @@ def connect_and_read():
             connection.close()
             print("Connection closed")
 
-# Run the function
-#connect_and_read()
