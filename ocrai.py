@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
 from pathlib import Path
-import requests
 from openai import OpenAI  # Ensure you have the openai package installed
 
 # Define the path to the .env file relative to the current file's location
@@ -54,7 +53,6 @@ def extract_dob_from_text(text):
         print(f"Error with OpenAI API: {e}")
         return None
 
-
 def connect_and_read_ocai():
     connection = None  # Initialize connection before the try block
     cursor = None      # Initialize cursor to ensure it's defined if used in finally block
@@ -74,7 +72,7 @@ def connect_and_read_ocai():
             # Create a cursor object
             cursor = connection.cursor()
 
-            # Define the query to read data from the avsdocs and users tables
+            # Define the query to read data from the ocr_logs table
             query = f"""
             SELECT * FROM `ocr_logs` WHERE `read_status`='completed' ORDER BY `doc_id` ASC
             """
@@ -86,20 +84,18 @@ def connect_and_read_ocai():
             rows = cursor.fetchall()
 
             for row in rows:
+                # Check if status is '0' before extracting DOB
+                if row[5] == '0':  # Assuming the status is in the 6th column (index 5)
+                    extracted_text = row[3]
+                    dob = extract_dob_from_text(extracted_text)
+                    
+                    # Determine the appropriate status based on the result of DOB extraction
+                    if dob:
+                        status = 'dob_extracted'
+                    else:
+                        status = "Error: Failed to extract DOB"
 
-                extracted_text=row[3]
-
-                dob=extract_dob_from_text(extracted_text);  
-
-                # Determine the appropriate status based on the result of DOB extraction
-                if dob:
-                    status = 'dob extracted'
-                else:
-                    status = f"Error: {dob}"  # If dob is None, it will contain the error message
-          
-                # If the data is found, update the response_data with the extracted text
-                if row:
-                     # Update the record in the ocr_logs table
+                    # Update the record in the ocr_logs table
                     update_query = """
                     UPDATE `ocr_logs` 
                     SET `dob` = %s, `status` = %s
@@ -107,9 +103,9 @@ def connect_and_read_ocai():
                     """
                     cursor.execute(update_query, (dob if dob else '', status, row[0]))
                     connection.commit()
-                    print(f"Updated response_data for doc_id {row[0]}.")
+                    print(f"Updated record for doc_id {row[0]}.")
                 else:
-                    print(f"No data found for doc_id {row[0]}.")
+                    print(f"Skipping doc_id {row[0]} with status {row[5]}.")
 
     except Error as e:
         print(f"Error: {e}")

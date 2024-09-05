@@ -55,11 +55,7 @@ def connect_and_read():
 
             # Define the query to read data from the avsdocs and users tables
             query = f"""
-            SELECT `avsdocs`.`id`, `users`.`id` AS user_id, CONCAT('{app_url}', `avsdocs`.`doc_url`) AS doc_url, `avsdocs`.`doc_file_type`
-            FROM `avsdocs`
-            LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id`
-            WHERE `users`.`age_verified` <> 'YES'
-            ORDER BY `avsdocs`.`id` DESC
+            SELECT `avsdocs`.`id`, `users`.`id` AS user_id, CONCAT('{app_url}', `avsdocs`.`doc_url`) AS doc_url, `avsdocs`.`doc_file_type` FROM `avsdocs` JOIN ( SELECT `user_id`, MAX(`id`) AS latest_id FROM `avsdocs` WHERE `doc_approved` IN ('no', 'not_yet') AND `is_deleted` = 'no' GROUP BY `user_id` ) AS latest_docs ON `avsdocs`.`id` = latest_docs.`latest_id` LEFT JOIN `users` ON `users`.`id` = `avsdocs`.`user_id` WHERE `users`.`age_verified` <> 'yes' ORDER BY `avsdocs`.`id` DESC
             """
 
             # Execute the query
