@@ -150,85 +150,6 @@ def extract_text_from_image(corrected_image, file_path, doc_id):
     else:
         print("Error: Could not correct the image orientation.")
 
-
-def extract_text_from_pdf_v1(pdf_file,doc_id):
-    try:
-        # Open the PDF file
-        with open(pdf_file, 'rb') as file:
-            # Create a PDF reader object
-            pdf_reader = PyPDF2.PdfReader(file)
-            
-            # Initialize an empty string to store the extracted text
-            extracted_text = ""
-            
-            # Iterate through all the pages in the PDF
-            for page_num in range(len(pdf_reader.pages)):
-                # Get the page object
-                page = pdf_reader.pages[page_num]
-                
-                # Extract text from the page
-                extracted_text += page.extract_text() + "\n"
-            
-                # Check if extracted_text is not empty before proceeding
-                if not extracted_text.strip():
-                    print("Extracted text is empty. Skipping database operation.")
-                    return  # Exit the function if no text was extracted
-                connection = None  # Initialize connection before the try block
-                cursor = None      # Initialize cursor to ensure it's defined if used in finally block
-
-                try:
-                    # Connect to the MySQL database
-                    connection = mysql.connector.connect(
-                        host=os.getenv("DB_HOST"),           # e.g., 'localhost' or the server's IP
-                        user=os.getenv("DB_USERNAME"),       # e.g., 'root'
-                        password=os.getenv("DB_PASSWORD"),   # your MySQL password
-                        database=os.getenv("DB_DATABASE")    # the database name
-                    )
-
-                    if connection.is_connected():
-                        print("Connected to the database")
-
-                        # Create a cursor object
-                        cursor = connection.cursor()
-
-                        # Define the query to read data from the ocr_logs table using the given doc_id
-                        select_query = """
-                        SELECT * FROM `ocr_logs` WHERE `id` = %s ORDER BY `id` ASC
-                        """
-                        cursor.execute(select_query, (doc_id,))
-
-                        # Fetch the row matching the doc_id
-                        row = cursor.fetchone()
-
-                        # If the data is found, update the response_data with the extracted text
-                        if row:
-                            update_query = """
-                            UPDATE `ocr_logs` 
-                            SET `response_data` = %s ,`read_status`='completed'
-                            WHERE `id` = %s ORDER BY `id` ASC
-                            """
-                            cursor.execute(update_query, (extracted_text, doc_id))
-                            connection.commit()
-                            print(f"Updated response_data for doc_id {doc_id}.")
-                        else:
-                            print(f"No data found for doc_id {doc_id}.")
-
-                except Error as e:
-                    print(f"Error: {e}")
-
-                finally:
-                    # Close the cursor if it exists
-                    if cursor:
-                        cursor.close()
-                    # Close the database connection
-                    if connection and connection.is_connected():
-                        connection.close()
-                        print("Connection closed")
-
-    except Exception as e:
-        print(f"Error reading PDF file: {e}")
-        return None
-
 def extract_text_from_pdf(pdf_file,doc_id):
     try:
         # Open the PDF file using pdfplumber
@@ -298,14 +219,6 @@ def extract_text_from_pdf(pdf_file,doc_id):
     except Exception as e:
         print(f"Error reading PDF file: {e}")
         return None
-
-# Example usage
-pdf_file_path = "sample.pdf"  # Replace with your PDF file path
-text = extract_text_from_pdf(pdf_file_path)
-
-if text:
-    print("Extracted text:")
-    print(text)
 
 
 def connect_and_read():
