@@ -162,27 +162,26 @@ def connect_and_read_ocai():
                 # Check if status is '0' before extracting DOB
                 if row[5] == '0':  # Assuming the status is in the 6th column (index 5)
                     extracted_text = row[3]
-                    if row[1]=='16416':
-                        file_id = row[0]  # Assuming the first column is the file ID
-                        dob = extract_dob_from_text(extracted_text, file_id)
-                        
-                        # Determine the appropriate status based on the result of DOB extraction
-                        if dob:
-                            status = 'dob_extracted'
-                        else:
-                            status = "Error: Failed to extract DOB"
-
-                        # Update the record in the ocr_logs table
-                        update_query = """
-                        UPDATE `ocr_logs` 
-                        SET `dob` = %s, `status` = %s
-                        WHERE `id` = %s
-                        """
-                        cursor.execute(update_query, (dob if dob else '', status, file_id))
-                        connection.commit()
-                        print(f"Updated record for doc_id {file_id}.")
+                    
+                    file_id = row[0]  # Assuming the first column is the file ID
+                    dob = extract_dob_from_text(extracted_text, file_id)
+                    
+                    # Determine the appropriate status based on the result of DOB extraction
+                    if dob:
+                        status = 'dob_extracted'
                     else:
-                        print(f"not read")
+                        status = "Error: Failed to extract DOB"
+
+                    # Update the record in the ocr_logs table
+                    update_query = """
+                    UPDATE `ocr_logs` 
+                    SET `dob` = %s, `status` = %s
+                    WHERE `id` = %s
+                    """
+                    cursor.execute(update_query, (dob if dob else '', status, file_id))
+                    connection.commit()
+                    print(f"Updated record for doc_id {file_id}.")
+                    
                 else:
                     print(f"Skipping doc_id {row[0]} with status {row[5]}.")
 
