@@ -196,6 +196,6 @@ def connect_and_read_ocai():
             print("Connection closed")
 
 # Uncomment these lines to run the main function
-# print("Starting connect_and_read_ocai...")
-# connect_and_read_ocai()
-# print("connect_and_read_ocai completed.")
+print("Starting connect_and_read_ocai...")
+connect_and_read_ocai()
+print("connect_and_read_ocai completed.")
