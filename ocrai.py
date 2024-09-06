@@ -66,8 +66,8 @@ def insert_cost_to_db(file_id, cost):
 
             # Define the query to insert the cost into ocr_api_cost table
             insert_query = """
-            INSERT INTO `ocr_api_cost` (`id`, `file_id`, `cost`, `created_at`) 
-            VALUES (NULL, %s, %s, %s)
+            INSERT INTO `ocr_api_cost` (`file_id`, `cost`, `created_at`) 
+            VALUES (%s, %s, %s)
             """
             created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute(insert_query, (file_id, cost, created_at))
@@ -89,11 +89,11 @@ def extract_dob_from_text(text, file_id):
     messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant that extracts dates of birth from the provided text.",
+            "content": "You are a helpful assistant that extracts date of birth from the provided text.",
         },
         {
             "role": "user",
-            "content": f"Extract the date of birth or DOB or Date of birth or Dale de naissance Fechi de oicimiento from the following text:\n\n{text} in yyyy-mm-dd format only and do not send any other data along with the DOB.",
+            "content": f"Extract the date of birth or DOB or Date of birth or Dale de naissance Fechi de oicimiento from the following text:\n\n{text} in yyyy-mm-dd format only and do not send any other data along with the DOB.In the text there may be text like '2A DATE OF BIRTH' ",
         },
     ]
     
@@ -162,24 +162,27 @@ def connect_and_read_ocai():
                 # Check if status is '0' before extracting DOB
                 if row[5] == '0':  # Assuming the status is in the 6th column (index 5)
                     extracted_text = row[3]
-                    file_id = row[0]  # Assuming the first column is the file ID
-                    dob = extract_dob_from_text(extracted_text, file_id)
-                    
-                    # Determine the appropriate status based on the result of DOB extraction
-                    if dob:
-                        status = 'dob_extracted'
-                    else:
-                        status = "Error: Failed to extract DOB"
+                    if row[1]=='16416':
+                        file_id = row[0]  # Assuming the first column is the file ID
+                        dob = extract_dob_from_text(extracted_text, file_id)
+                        
+                        # Determine the appropriate status based on the result of DOB extraction
+                        if dob:
+                            status = 'dob_extracted'
+                        else:
+                            status = "Error: Failed to extract DOB"
 
-                    # Update the record in the ocr_logs table
-                    update_query = """
-                    UPDATE `ocr_logs` 
-                    SET `dob` = %s, `status` = %s
-                    WHERE `id` = %s
-                    """
-                    cursor.execute(update_query, (dob if dob else '', status, file_id))
-                    connection.commit()
-                    print(f"Updated record for doc_id {file_id}.")
+                        # Update the record in the ocr_logs table
+                        update_query = """
+                        UPDATE `ocr_logs` 
+                        SET `dob` = %s, `status` = %s
+                        WHERE `id` = %s
+                        """
+                        cursor.execute(update_query, (dob if dob else '', status, file_id))
+                        connection.commit()
+                        print(f"Updated record for doc_id {file_id}.")
+                    else:
+                        print(f"not read")
                 else:
                     print(f"Skipping doc_id {row[0]} with status {row[5]}.")
 
